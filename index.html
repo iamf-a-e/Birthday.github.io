@@ -1,644 +1,305 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Airtel iPhone Simulator</title>
+
 <style>
-@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@200;300;400;600&family=Inter:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#667eea,#764ba2);display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Nunito',sans-serif;padding:20px}
+  .wrap{text-align:center}
+  .title-txt{color:white;margin-bottom:20px;font-size:1.8rem;font-weight:700;text-shadow:2px 2px 8px rgba(0,0,0,0.3)}
+  .phone{width:375px;height:812px;background:#000;border-radius:54px;box-shadow:0 0 0 1px #333,0 0 0 3px #1a1a1a,0 0 0 5px #444,0 60px 120px rgba(0,0,0,0.8);position:relative;overflow:hidden;margin:0 auto}
+  .phone::before{content:'';position:absolute;right:-5px;top:140px;width:4px;height:70px;background:#333;border-radius:0 3px 3px 0;box-shadow:0 90px 0 #333}
+  .phone::after{content:'';position:absolute;left:-5px;top:120px;width:4px;height:35px;background:#333;border-radius:3px 0 0 3px;box-shadow:0 50px 0 #333,0 95px 0 #333}
+  .screen{width:100%;height:100%;border-radius:54px;overflow:hidden;position:relative}
 
-*{margin:0;padding:0;box-sizing:border-box}
+  /* ── INCOMING CALL ── */
+  .call-screen{position:absolute;inset:0;background:linear-gradient(180deg,#111827 0%,#1e3a5f 55%,#0f2744 100%);border-radius:54px;display:flex;flex-direction:column;align-items:center;z-index:30}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:50}
+  .sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 28px 0;color:white;font-size:13px;font-weight:600;width:100%;position:relative;z-index:10}
 
-body{
-  background:linear-gradient(135deg,#b8cfe8 0%,#c9dde8 30%,#d4e8e0 60%,#cce0d4 100%);
-  display:flex;justify-content:center;align-items:flex-start;
-  min-height:100vh;font-family:'Inter',sans-serif;padding:40px 20px;
-}
+  .call-top{display:flex;flex-direction:column;align-items:center;margin-top:58px;width:100%}
+  .incoming-lbl{color:rgba(255,255,255,0.65);font-size:15px;font-weight:400;margin-bottom:8px;letter-spacing:0.2px}
+  .caller-name{color:white;font-size:38px;font-weight:300;letter-spacing:-0.5px}
+  .caller-sub{color:rgba(255,255,255,0.5);font-size:14px;margin-top:6px}
 
-.page-wrap{display:flex;flex-direction:column;align-items:center;gap:24px}
+  /* Avatar + pulses */
+  .avatar-wrap{position:relative;display:flex;align-items:center;justify-content:center;margin-top:36px;width:160px;height:160px}
+  .pulse{position:absolute;border-radius:50%;border:1.5px solid rgba(255,255,255,0.15);animation:pulse 2.4s ease-out infinite}
+  .pulse:nth-child(1){width:150px;height:150px;animation-delay:0s}
+  .pulse:nth-child(2){width:195px;height:195px;animation-delay:0.6s}
+  .pulse:nth-child(3){width:240px;height:240px;animation-delay:1.2s}
+  @keyframes pulse{0%{transform:scale(.75);opacity:0}40%{opacity:1}100%{transform:scale(1.2);opacity:0}}
+  .avatar{width:118px;height:118px;border-radius:59px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;font-size:50px;position:relative;z-index:2;border:3px solid rgba(255,255,255,0.2)}
+  @keyframes jiggle{0%,100%{transform:rotate(0)}15%{transform:rotate(-9deg)}30%{transform:rotate(9deg)}45%{transform:rotate(-6deg)}60%{transform:rotate(6deg)}75%{transform:rotate(-3deg)}88%{transform:rotate(3deg)}}
+  .avatar{animation:jiggle 2.2s ease-in-out infinite}
 
-/* ── IPHONE 15 PRO SHELL ── */
-.phone{
-  width:393px;height:852px;
-  background:#1a1a1a;
-  border-radius:54px;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.15),
-    0 0 0 1px rgba(0,0,0,0.6),
-    0 0 0 2px #2a2828,
-    0 0 0 4px #1a1818,
-    0 0 0 5px rgba(255,255,255,0.06),
-    0 60px 120px rgba(0,0,0,0.55),
-    0 20px 40px rgba(0,0,0,0.3);
-  position:relative;overflow:hidden;user-select:none;
-}
+  /* Quick-action buttons */
+  .quick-btns{display:flex;gap:44px;margin-top:48px}
+  .qbtn{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer}
+  .qbtn-circle{width:54px;height:54px;border-radius:27px;background:rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-size:22px;transition:background .15s}
+  .qbtn-circle:active{background:rgba(255,255,255,0.28)}
+  .qbtn-lbl{color:rgba(255,255,255,0.75);font-size:12px;font-weight:400}
 
-/* Titanium side buttons */
-.phone::before{
-  content:'';position:absolute;right:-3px;top:168px;
-  width:3px;height:78px;background:linear-gradient(180deg,#3a3a3a,#2a2a2a);
-  border-radius:0 2px 2px 0;box-shadow:0 102px 0 #2a2a2a;
-}
-.phone::after{
-  content:'';position:absolute;left:-3px;top:132px;
-  width:3px;height:38px;background:linear-gradient(180deg,#3a3a3a,#2a2a2a);
-  border-radius:2px 0 0 2px;box-shadow:0 54px 0 #2a2a2a,0 106px 0 #2a2a2a;
-}
+  /* ── SLIDE TO ANSWER ── */
+  .slide-area{margin-top:auto;margin-bottom:56px;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+  .slide-hint{color:rgba(255,255,255,0.45);font-size:13px;font-weight:400;letter-spacing:0.2px}
+  .slide-track{width:300px;height:64px;background:rgba(255,255,255,0.10);border-radius:32px;position:relative;border:1px solid rgba(255,255,255,0.18);overflow:hidden;touch-action:none;cursor:pointer;user-select:none}
+  .slide-fill{position:absolute;left:0;top:0;height:100%;width:64px;background:rgba(52,199,89,0.0);border-radius:32px;transition:none;pointer-events:none}
+  .slide-thumb{position:absolute;left:6px;top:6px;width:52px;height:52px;border-radius:26px;background:#34c759;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:grab;box-shadow:0 2px 12px rgba(52,199,89,0.5);transition:left .05s;will-change:left}
+  .slide-arrow-txt{position:absolute;right:20px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.55);font-size:22px;pointer-events:none;letter-spacing:-4px}
+  .slide-label{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;color:rgba(255,255,255,0.6);font-size:14px;font-weight:400;pointer-events:none;padding-left:60px;padding-right:20px}
 
-.screen{width:100%;height:100%;border-radius:54px;overflow:hidden;position:relative}
+  /* ── ACTIVE CALL ── */
+  .active-call{display:none;position:absolute;inset:0;background:linear-gradient(180deg,#0d1f0d 0%,#132913 100%);border-radius:54px;z-index:40;flex-direction:column;align-items:center}
+  .ac-name{color:white;font-size:30px;font-weight:300;margin-top:90px}
+  .ac-timer{color:rgba(255,255,255,0.55);font-size:16px;margin-top:10px}
+  .ac-sub{color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px}
+  .ac-avatar{font-size:64px;margin-top:48px;animation:jiggle 3s ease-in-out infinite}
+  .ac-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 36px;margin-top:auto;margin-bottom:16px;width:100%}
+  .ac-btn{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+  .ac-btn-circle{width:56px;height:56px;border-radius:28px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;transition:background .15s}
+  .ac-btn-circle:active{background:rgba(255,255,255,0.24)}
+  .ac-btn-lbl{color:rgba(255,255,255,0.65);font-size:11px;font-weight:400}
+  .end-row{margin-bottom:52px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .end-btn{width:72px;height:72px;border-radius:36px;background:#ff3b30;border:none;font-size:28px;cursor:pointer;box-shadow:0 4px 18px rgba(255,59,48,0.45);display:flex;align-items:center;justify-content:center;transition:transform .1s}
+  .end-btn:active{transform:scale(.91)}
+  .end-lbl{color:rgba(255,255,255,0.7);font-size:13px}
 
-/* ── DYNAMIC ISLAND ── */
-.dynamic-island{
-  position:absolute;top:12px;left:50%;transform:translateX(-50%);
-  width:120px;height:35px;background:#000;border-radius:20px;z-index:200;
-  transition:width .35s cubic-bezier(.34,1.56,.64,1),height .35s cubic-bezier(.34,1.56,.64,1),border-radius .35s ease;
-}
-.dynamic-island.ringing{
-  width:270px;height:52px;border-radius:28px;
-}
-.island-call-info{
-  display:none;align-items:center;gap:10px;padding:8px 14px;height:100%;
-}
-.dynamic-island.ringing .island-call-info{display:flex}
-.island-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#34c759,#248a3d);
-  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.island-text{flex:1;min-width:0}
-.island-name{color:white;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.island-sub{color:rgba(255,255,255,0.45);font-size:10.5px;margin-top:1px}
-.island-green-dot{width:9px;height:9px;border-radius:50%;background:#34c759;flex-shrink:0;
-  animation:pulse 1.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.85)}}
+  /* ── HOME ── */
+  .home-screen{display:none;position:absolute;inset:0;background:linear-gradient(160deg,#0d47a1,#1565c0 30%,#6a1b9a 70%,#4a148c);border-radius:54px;flex-direction:column}
+  .home-screen.show{display:flex}
+  .home-sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 28px 0;color:white;font-size:14px;font-weight:600;position:relative;z-index:10}
+  .home-clock{text-align:center;margin-top:56px;color:white;position:relative;z-index:5}
+  .home-clock .t{font-size:76px;font-weight:200;letter-spacing:-3px}
+  .home-clock .d{font-size:17px;opacity:.85;margin-top:-4px}
+  .app-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;padding:28px 22px;margin-top:auto;position:relative;z-index:5}
+  .app-ic{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+  .app-ic-img{width:58px;height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 12px rgba(0,0,0,0.35)}
+  .app-lbl{color:white;font-size:11px;font-weight:500;text-shadow:0 1px 3px rgba(0,0,0,0.7)}
+  .dock{background:rgba(255,255,255,0.13);backdrop-filter:blur(20px);border-radius:30px;margin:0 16px 34px;padding:12px 18px;display:flex;justify-content:space-around;position:relative;z-index:5}
+  .home-indicator{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:130px;height:5px;background:rgba(255,255,255,0.28);border-radius:3px;z-index:100}
 
-/* ── STATUS BAR ── */
-.status-bar{
-  position:absolute;top:0;left:0;right:0;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:16px 28px 0;z-index:100;pointer-events:none;
-}
-.status-time{color:white;font-size:15.5px;font-weight:600;letter-spacing:-0.2px}
-.status-icons{display:flex;align-items:center;gap:7px}
-
-/* SVG signal bars */
-.signal-bars{display:flex;align-items:flex-end;gap:1.5px;height:12px}
-.signal-bars span{background:white;border-radius:1px;width:3px}
-.signal-bars span:nth-child(1){height:4px}
-.signal-bars span:nth-child(2){height:6px}
-.signal-bars span:nth-child(3){height:9px}
-.signal-bars span:nth-child(4){height:12px}
-
-.wifi-icon svg,.battery-icon svg{fill:white}
-
-/* ── SCREENS ── */
-.layer{position:absolute;inset:0;border-radius:54px;overflow:hidden}
-
-/* ══ INCOMING CALL SCREEN ══ */
-#ringScreen{
-  background:linear-gradient(180deg,
-    #3b7a8a 0%,
-    #2a7a80 15%,
-    #1e7a75 40%,
-    #1a706a 65%,
-    #165f5a 85%,
-    #134f4a 100%);
-  display:flex;flex-direction:column;align-items:center;z-index:10;
-}
-
-/* Subtle noise texture overlay */
-#ringScreen::after{
-  content:'';position:absolute;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;opacity:0.5;
-}
-
-.ring-top{display:flex;flex-direction:column;align-items:center;margin-top:106px;width:100%;position:relative;z-index:2}
-.ring-label{
-  color:rgba(255,255,255,0.6);
-  font-size:15px;font-weight:400;
-  margin-bottom:8px;letter-spacing:0.1px;
-}
-.ring-name{
-  color:white;font-size:46px;font-weight:300;
-  letter-spacing:-1px;text-align:center;
-  line-height:1.05;
-}
-.ring-number{color:rgba(255,255,255,0.45);font-size:14.5px;margin-top:9px;font-weight:400}
-
-/* Quick action buttons — aligned over ends of slide track */
-.quick-actions{
-  display:flex;justify-content:space-between;align-items:flex-end;
-  width:308px;
-  margin-top:auto;margin-bottom:22px;
-  position:relative;z-index:2;
-}
-.qa-btn{display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer}
-.qa-circle{
-  width:54px;height:54px;border-radius:27px;
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border:0.5px solid rgba(255,255,255,0.18);
-  display:flex;align-items:center;justify-content:center;
-  transition:background .15s,transform .1s;
-}
-.qa-circle:active{background:rgba(255,255,255,0.28);transform:scale(0.93)}
-.qa-circle svg{width:22px;height:22px;fill:white;opacity:0.9}
-.qa-label{color:rgba(255,255,255,0.6);font-size:11.5px;font-weight:400;letter-spacing:0.1px}
-
-/* ── SLIDE TO ANSWER ── */
-.slide-area{margin-bottom:56px;position:relative;z-index:2}
-
-.slide-track{
-  width:308px;height:72px;
-  background:rgba(0,0,0,0.25);
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
-  border-radius:36px;
-  border:0.5px solid rgba(255,255,255,0.12);
-  position:relative;overflow:hidden;
-  touch-action:none;cursor:pointer;user-select:none;
-}
-
-/* Inner glass sheen */
-.slide-track::before{
-  content:'';position:absolute;inset:0;border-radius:36px;
-  background:linear-gradient(180deg,rgba(255,255,255,0.07) 0%,transparent 60%);
-  pointer-events:none;
-}
-
-.slide-glow{
-  position:absolute;inset:0;border-radius:36px;
-  background:linear-gradient(90deg,rgba(52,199,89,0.18) 0%,transparent 65%);
-  opacity:0;pointer-events:none;transition:opacity .1s;
-}
-.slide-thumb{
-  position:absolute;left:8px;top:8px;
-  width:56px;height:56px;border-radius:28px;
-  background:linear-gradient(145deg,#3ed662,#34c759);
-  display:flex;align-items:center;justify-content:center;
-  cursor:grab;
-  box-shadow:0 2px 12px rgba(52,199,89,0.45),0 1px 3px rgba(0,0,0,0.2);
-  will-change:left;
-}
-.slide-thumb svg{width:28px;height:28px;fill:white}
-.slide-text{
-  position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;
-  color:rgba(255,255,255,0.65);font-size:15.5px;font-weight:400;
-  pointer-events:none;padding-left:68px;letter-spacing:0.1px;
-  animation:textBreath 2s ease-in-out infinite;
-}
-@keyframes textBreath{0%,100%{opacity:.65}50%{opacity:.9}}
-
-/* ══ VIDEO SCREEN ══ */
-#videoScreen{
-  background:#000;display:none;z-index:40;
-  flex-direction:column;align-items:stretch;justify-content:center;
-}
-#videoScreen.show{display:flex}
-#birthdayVideo{width:100%;height:100%;object-fit:cover;border-radius:54px}
-.video-controls{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:0 0 52px;
-  background:linear-gradient(transparent,rgba(0,0,0,0.72));
-  display:flex;flex-direction:column;align-items:center;gap:7px;
-  border-radius:0 0 54px 54px;
-}
-.video-caller{color:white;font-size:17px;font-weight:400;opacity:.9}
-.video-timer{color:rgba(255,255,255,0.5);font-size:14px;font-family:monospace;letter-spacing:1px}
-.video-end-btn{
-  width:68px;height:68px;border-radius:34px;
-  background:#ff3b30;border:none;font-size:28px;cursor:pointer;
-  box-shadow:0 4px 24px rgba(255,59,48,0.5);
-  display:flex;align-items:center;justify-content:center;
-  transition:transform .1s;margin-top:10px;
-}
-.video-end-btn:active{transform:scale(.9)}
-.video-end-lbl{color:rgba(255,255,255,0.6);font-size:13px}
-
-/* ══ HOME SCREEN ══ */
-#homeScreen{
-  background:linear-gradient(160deg,#0d47a1 0%,#1565c0 30%,#6a1b9a 70%,#4a148c 100%);
-  display:none;flex-direction:column;z-index:5;
-}
-#homeScreen.show{display:flex}
-.home-clock{text-align:center;margin-top:80px;color:white;position:relative;z-index:5}
-.home-clock .hc-time{font-size:80px;font-weight:200;letter-spacing:-4px;text-shadow:0 2px 20px rgba(0,0,0,0.3)}
-.home-clock .hc-date{font-size:17px;font-weight:400;opacity:.85;margin-top:-4px}
-.app-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:20px;padding:28px 22px;margin-top:auto;position:relative;z-index:5;
-}
-.app-icon{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform .1s}
-.app-icon:active{transform:scale(.88)}
-.app-icon-img{
-  width:60px;height:60px;border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;box-shadow:0 3px 12px rgba(0,0,0,0.35);position:relative;
-}
-.app-label{color:white;font-size:11px;font-weight:500;text-shadow:0 1px 3px rgba(0,0,0,0.7)}
-.dock{
-  background:rgba(255,255,255,0.14);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border-radius:30px;margin:0 16px 38px;padding:12px 18px;
-  display:flex;justify-content:space-around;position:relative;z-index:5;
-}
-.badge{
-  position:absolute;top:-4px;right:-4px;
-  background:#ff3b30;color:white;font-size:10px;font-weight:700;
-  min-width:18px;height:18px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  padding:0 4px;border:1.5px solid rgba(255,255,255,0.8);
-}
-.home-indicator{
-  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
-  width:132px;height:5px;background:rgba(255,255,255,0.3);border-radius:3px;z-index:200;
-}
-
-/* ══ OVERLAYS ══ */
-.overlay{
-  position:absolute;inset:0;background:#f2f2f7;
-  border-radius:54px;overflow:hidden;display:none;flex-direction:column;z-index:30;
-}
-.overlay.active{display:flex;animation:slideUp .3s cubic-bezier(.22,1,.36,1)}
-@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
-.app-header{
-  background:rgba(242,242,247,0.96);backdrop-filter:blur(12px);
-  padding:52px 20px 14px;border-bottom:0.5px solid rgba(0,0,0,0.12);
-  display:flex;align-items:center;gap:12px;
-}
-.app-header-title{font-size:22px;font-weight:700;color:#000}
-.back-btn{color:#007aff;font-size:16px;cursor:pointer;font-weight:500;min-width:30px}
-
-/* Dialpad */
-.dialpad-container{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 20px 20px}
-.display-number{
-  font-size:44px;font-weight:300;color:#000;
-  letter-spacing:3px;min-height:64px;text-align:center;
-  margin-bottom:22px;word-break:break-all;width:100%;
-}
-.dialpad{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:14px;width:100%;max-width:290px;margin-bottom:22px;
-}
-.dial-key{
-  background:white;border:none;border-radius:50%;
-  width:74px;height:74px;margin:auto;
-  font-size:26px;font-weight:400;color:#000;cursor:pointer;
-  box-shadow:0 2px 8px rgba(0,0,0,0.12);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:background .08s;line-height:1;font-family:'Inter',sans-serif;
-}
-.dial-key:active{background:#d1d1d6}
-.dial-key .sub{font-size:9px;color:#888;margin-top:2px;font-weight:600;letter-spacing:1px}
-.dial-row{display:flex;gap:22px;align-items:center;width:100%;max-width:290px;justify-content:center}
-.call-btn{
-  background:#34c759;border:none;border-radius:50%;
-  width:74px;height:74px;font-size:30px;color:white;cursor:pointer;
-  box-shadow:0 4px 18px rgba(52,199,89,0.45);
-  display:flex;align-items:center;justify-content:center;transition:transform .1s;
-}
-.call-btn:active{transform:scale(.94)}
-.delete-btn{background:none;border:none;font-size:26px;cursor:pointer;color:#8e8e93;display:flex;align-items:center;justify-content:center;width:74px;height:74px}
-
-/* Messages */
-.messages-list{flex:1;overflow-y:auto;padding:0}
-.message-thread{background:white;display:flex;align-items:center;padding:13px 16px;border-bottom:0.5px solid #e5e5ea;cursor:pointer;gap:13px;transition:background .1s}
-.message-thread:active{background:#f2f2f7}
-.thread-avatar{width:52px;height:52px;border-radius:26px;background:linear-gradient(135deg,#ff3b30,#ff9500);display:flex;align-items:center;justify-content:center;color:white;font-size:22px;font-weight:700;flex-shrink:0}
-.thread-info{flex:1;min-width:0}
-.thread-name{font-size:16px;font-weight:600;color:#000}
-.thread-preview{font-size:13px;color:#8e8e93;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.thread-time{font-size:12px;color:#8e8e93}
-.msg-view{display:none;flex-direction:column;position:absolute;inset:0;background:#f2f2f7;z-index:35}
-.msg-view.active{display:flex}
-.msg-bubbles{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
-.msg-bubble{max-width:80%;background:#e5e5ea;border-radius:18px 18px 18px 4px;padding:10px 14px;font-size:14px;color:#000;line-height:1.55;white-space:pre-wrap;align-self:flex-start}
-.msg-time{font-size:11px;color:#8e8e93;text-align:center;margin:4px 0}
-.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#8e8e93;gap:12px;font-size:15px}
-.empty-state .es-icon{font-size:52px}
-
-/* USSD */
-.ussd-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.52);display:none;align-items:center;justify-content:center;z-index:60;border-radius:54px}
-.ussd-overlay.active{display:flex;animation:popIn .2s ease}
-@keyframes popIn{from{transform:scale(.84);opacity:0}to{transform:scale(1);opacity:1}}
-.ussd-box{background:#1c1c1e;border-radius:16px;width:308px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.7)}
-.ussd-title{color:white;font-size:13px;font-weight:600;text-align:center;padding:18px 20px 8px;opacity:.5;letter-spacing:.5px}
-.ussd-content{color:white;font-size:14px;line-height:1.75;padding:0 22px 18px;text-align:center;white-space:pre-line}
-.ussd-input-area{padding:4px 22px 18px}
-.ussd-input{width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:10px;color:white;font-size:15px;padding:9px 13px;font-family:'Inter',sans-serif;outline:none;text-align:center}
-.ussd-input::placeholder{color:rgba(255,255,255,0.4)}
-.ussd-actions{display:flex;border-top:1px solid rgba(255,255,255,0.1)}
-.ussd-btn{flex:1;padding:15px;border:none;background:none;color:#0a84ff;font-size:16px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
-.ussd-btn:hover{background:rgba(255,255,255,0.06)}
-.ussd-btn.dismiss{border-right:1px solid rgba(255,255,255,0.1);color:white;font-weight:400;opacity:.65}
+  @keyframes shimmer{0%,100%{opacity:.45}50%{opacity:.9}}
+  .slide-label{animation:shimmer 1.6s ease-in-out infinite}
 </style>
-</head>
-<body>
 
-<div class="page-wrap">
-
+<div class="wrap">
+  <div class="title-txt">📱 Airtel Zambia Simulator</div>
   <div class="phone">
-
-    <!-- Dynamic Island -->
-    <div class="dynamic-island" id="dynamicIsland">
-      <div class="island-call-info" id="islandCallInfo">
-        <div class="island-avatar">📞</div>
-        <div class="island-text">
-          <div class="island-name">Airtel Zambia</div>
-          <div class="island-sub">incoming call</div>
-        </div>
-        <div class="island-green-dot"></div>
-      </div>
-    </div>
-
     <div class="screen">
 
-      <!-- Status bar -->
-      <div class="status-bar" id="statusBar">
-        <span class="status-time" id="statusTime">9:41</span>
-        <div class="status-icons">
-          <!-- Signal bars -->
-          <div class="signal-bars">
-            <span></span><span></span><span></span><span></span>
-          </div>
-          <!-- WiFi -->
-          <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 9.5a1.2 1.2 0 1 1 0 2.4A1.2 1.2 0 0 1 8 9.5z" fill="white"/>
-            <path d="M4.8 7.2a4.52 4.52 0 0 1 6.4 0" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-            <path d="M2.2 4.6a7.8 7.8 0 0 1 11.6 0" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-            <path d="M0 2.1a10.8 10.8 0 0 1 16 0" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-          </svg>
-          <!-- Battery -->
-          <svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="white" stroke-opacity="0.35"/>
-            <rect x="2" y="2" width="16" height="8" rx="2" fill="white"/>
-            <path d="M23 4v4a2 2 0 0 0 0-4z" fill="white" fill-opacity="0.4"/>
-          </svg>
-        </div>
-      </div>
-
-      <!-- ══ LAYER 1: INCOMING CALL SCREEN ══ -->
-      <div class="layer" id="ringScreen">
-        <div class="ring-top">
-          <div class="ring-label"></div>
-          <div class="ring-name">Birthday</div>
-          <div class="ring-number">calling...</div>
+      <!-- INCOMING CALL -->
+      <div class="call-screen" id="callScreen">
+        <div class="notch"></div>
+        <div class="sbar">
+          <span id="sbarTime">9:41</span>
+          <div style="display:flex;gap:5px;font-size:12px"><span>📶</span><span>🔋</span></div>
         </div>
 
-        <div class="quick-actions">
-          <div class="qa-btn" onclick="quickMessage()">
-            <div class="qa-circle">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"/></svg>
-            </div>
-            <div class="qa-label">Message</div>
+        <div class="call-top">
+          <div class="incoming-lbl">incoming call</div>
+          <div class="caller-name">Birthday 🎂</div>
+          <div class="caller-sub">+260 97 123 4567 · Airtel</div>
+        </div>
+
+        <div class="avatar-wrap">
+          <div class="pulse"></div>
+          <div class="pulse"></div>
+          <div class="pulse"></div>
+          <div class="avatar">🎂</div>
+        </div>
+
+        <div class="quick-btns">
+          <div class="qbtn">
+            <div class="qbtn-circle" onclick="remindMe()">⏰</div>
+            <div class="qbtn-lbl">Remind Me</div>
           </div>
-          <div class="qa-btn" onclick="remindMe()">
-            <div class="qa-circle">
-              <!-- Voicemail icon -->
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="7" cy="13" r="4" stroke="white" stroke-width="1.8" fill="none"/>
-                <circle cx="17" cy="13" r="4" stroke="white" stroke-width="1.8" fill="none"/>
-                <line x1="11" y1="17" x2="13" y2="17" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-                <rect x="3" y="13" width="8" height="4" fill="none"/>
-              </svg>
-            </div>
-            <div class="qa-label">Voicemail</div>
+          <div class="qbtn">
+            <div class="qbtn-circle" onclick="sendMsg()">💬</div>
+            <div class="qbtn-lbl">Message</div>
           </div>
         </div>
 
         <div class="slide-area">
           <div class="slide-track" id="slideTrack">
-            <div class="slide-glow" id="slideGlow"></div>
-            <div class="slide-thumb" id="slideThumb">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.47 11.47 0 003.58.57 1 1 0 011 1V21a1 1 0 01-1 1A17 17 0 013 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
-            </div>
-            <div class="slide-text" id="slideText">slide to answer</div>
+            <div class="slide-fill" id="slideFill"></div>
+            <div class="slide-thumb" id="slideThumb">📞</div>
+            <div class="slide-label" id="slideLabel">slide to answer</div>
+            <div class="slide-arrow-txt" id="slideArrows">››</div>
           </div>
         </div>
       </div>
 
-      <!-- ══ LAYER 2: VIDEO CALL SCREEN ══ -->
-      <div class="layer" id="videoScreen">
-        <video id="birthdayVideo" playsinline autoplay loop>
-          <source src="birthday.mp4" type="video/mp4">
-        </video>
-        <div class="video-controls">
-          <div class="video-caller">Birthday 🎂</div>
-          <div class="video-timer" id="videoTimer">00:00</div>
-          <button class="video-end-btn" onclick="endCall()">📵</button>
-          <div class="video-end-lbl">end</div>
+      <!-- ACTIVE CALL -->
+      <div class="active-call" id="activeCall">
+        <div class="notch"></div>
+        <div class="sbar" style="padding-top:14px;">
+          <span id="acSbarTime">9:41</span>
+          <div style="display:flex;gap:5px;font-size:12px"><span>📶</span><span>🔋</span></div>
+        </div>
+        <div class="ac-name">Birthday 🎂</div>
+        <div class="ac-timer" id="acTimer">00:00</div>
+        <div class="ac-sub">Airtel Zambia</div>
+        <div class="ac-avatar">🎂</div>
+        <div class="ac-actions">
+          <div class="ac-btn"><div class="ac-btn-circle">🔇</div><div class="ac-btn-lbl">mute</div></div>
+          <div class="ac-btn"><div class="ac-btn-circle">⌨️</div><div class="ac-btn-lbl">keypad</div></div>
+          <div class="ac-btn"><div class="ac-btn-circle">🔊</div><div class="ac-btn-lbl">speaker</div></div>
+          <div class="ac-btn"><div class="ac-btn-circle">➕</div><div class="ac-btn-lbl">add call</div></div>
+          <div class="ac-btn"><div class="ac-btn-circle">📹</div><div class="ac-btn-lbl">FaceTime</div></div>
+          <div class="ac-btn"><div class="ac-btn-circle">👤</div><div class="ac-btn-lbl">contacts</div></div>
+        </div>
+        <div class="end-row">
+          <button class="end-btn" onclick="endCall()">📵</button>
+          <div class="end-lbl">end</div>
         </div>
       </div>
 
-      <!-- ══ LAYER 3: HOME SCREEN ══ -->
-      <div class="layer" id="homeScreen">
+      <!-- HOME SCREEN -->
+      <div class="home-screen" id="homeScreen">
+        <div class="notch"></div>
+        <div class="home-sbar">
+          <span id="homeSbarTime">9:41</span>
+          <div style="display:flex;gap:5px;font-size:12px"><span>📶</span><span>🔋</span></div>
+        </div>
         <div class="home-clock">
-          <div class="hc-time" id="homeClock">9:41</div>
-          <div class="hc-date" id="homeDate">Sunday, 25 May</div>
+          <div class="t" id="homeClock">9:41</div>
+          <div class="d" id="homeDate">Sunday, 25 May</div>
         </div>
         <div class="app-grid" id="appGrid"></div>
         <div class="dock" id="dock"></div>
         <div class="home-indicator"></div>
       </div>
 
-      <!-- ══ PHONE APP ══ -->
-      <div class="overlay" id="phoneApp">
-        <div class="app-header">
-          <span class="back-btn" onclick="closeApp('phoneApp')">✕</span>
-          <span class="app-header-title">Phone</span>
-        </div>
-        <div class="dialpad-container">
-          <div class="display-number" id="dialDisplay"></div>
-          <div class="dialpad" id="dialpad"></div>
-          <div class="dial-row">
-            <div style="width:74px"></div>
-            <button class="call-btn" onclick="dialCall()">📞</button>
-            <button class="delete-btn" onclick="dialDelete()">⌫</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ MESSAGES APP ══ -->
-      <div class="overlay" id="messagesApp">
-        <div style="display:flex;flex-direction:column;height:100%">
-          <div class="app-header">
-            <span class="back-btn" onclick="closeApp('messagesApp')">✕</span>
-            <span class="app-header-title">Messages</span>
-          </div>
-          <div class="messages-list" id="messagesList">
-            <div class="empty-state" id="emptyMsgState">
-              <span class="es-icon">💬</span>
-              <div>No messages yet</div>
-              <div style="font-size:13px;text-align:center;padding:0 40px;color:#aaa">Dial *117# for Airtel services</div>
-            </div>
-          </div>
-        </div>
-        <div class="msg-view" id="msgView">
-          <div style="background:rgba(242,242,247,0.96);padding:52px 16px 13px;border-bottom:.5px solid rgba(0,0,0,0.1);display:flex;align-items:center;gap:12px">
-            <span class="back-btn" onclick="closeMsgView()">‹ Back</span>
-            <div style="flex:1;text-align:center;font-size:16px;font-weight:700" id="msgViewSender">Airtel</div>
-            <div style="width:52px"></div>
-          </div>
-          <div class="msg-bubbles" id="msgBubbles"></div>
-        </div>
-      </div>
-
-      <!-- ══ USSD DIALOG ══ -->
-      <div class="ussd-overlay" id="ussdDialog">
-        <div class="ussd-box">
-          <div class="ussd-title">AIRTEL · *117#</div>
-          <div class="ussd-content" id="ussdContent"></div>
-          <div class="ussd-input-area" id="ussdInputArea" style="display:none">
-            <input class="ussd-input" id="ussdInput" type="text" placeholder="Enter reply…" />
-          </div>
-          <div class="ussd-actions" id="ussdActions"></div>
-        </div>
-      </div>
-
     </div>
   </div>
-
-  <p style="color:rgba(0,0,0,0.45);font-size:13.5px;font-weight:400;letter-spacing:0.1px">Slide the green button right to answer</p>
+  <p style="color:white;margin-top:12px;opacity:.75;font-size:14px">Slide the green button right to answer</p>
 </div>
 
 <script>
-let dialInput = '';
-let currentMessages = [];
-let callSecs = 0;
-let callInterval = null;
+const TRACK_W = 300, THUMB_W = 52, THUMB_PAD = 6;
+const MAX_X = TRACK_W - THUMB_W - THUMB_PAD * 2;
+const SNAP_THRESH = MAX_X * 0.72;
 
-// ── SLIDE TO ANSWER ──
-const TRACK_W = 308, THUMB_W = 56, PAD = 8;
-const MAX_X = TRACK_W - THUMB_W - PAD * 2;
-const SNAP = MAX_X * 0.68;
-
-let dragging = false, startX = 0, thumbX = 0;
+let dragging = false, startX = 0, curX = 0, thumbX = 0;
+let callSecs = 0, callInterval = null;
 
 const track = document.getElementById('slideTrack');
 const thumb = document.getElementById('slideThumb');
-const glow  = document.getElementById('slideGlow');
-const slideText = document.getElementById('slideText');
+const fill  = document.getElementById('slideFill');
+const lbl   = document.getElementById('slideLabel');
+const arrows= document.getElementById('slideArrows');
+
+function setThumbPos(x){
+  x = Math.max(0, Math.min(x, MAX_X));
+  thumbX = x;
+  thumb.style.left = (x + THUMB_PAD) + 'px';
+  const pct = x / MAX_X;
+  fill.style.width = (x + THUMB_PAD + THUMB_W) + 'px';
+  fill.style.background = `rgba(52,199,89,${pct * 0.35})`;
+  lbl.style.opacity = Math.max(0, 1 - pct * 2.5);
+  arrows.style.opacity = Math.max(0, 1 - pct * 2);
+}
 
 function getClientX(e){ return e.touches ? e.touches[0].clientX : e.clientX; }
 
-function setPos(x){
-  x = Math.max(0, Math.min(x, MAX_X));
-  thumbX = x;
-  thumb.style.left = (x + PAD) + 'px';
-  const progress = x / MAX_X;
-  glow.style.opacity = progress * 0.8;
-  slideText.style.opacity = 1 - progress * 1.5;
+track.addEventListener('mousedown', startDrag);
+track.addEventListener('touchstart', startDrag, {passive:true});
+
+function startDrag(e){
+  const rect = thumb.getBoundingClientRect();
+  const ex = getClientX(e);
+  if(ex < rect.left - 10 || ex > rect.right + 10) return;
+  dragging = true;
+  startX = ex - thumbX;
+  thumb.style.transition = 'none';
+  thumb.style.cursor = 'grabbing';
+  e.preventDefault && e.preventDefault();
 }
 
-track.addEventListener('mousedown', e => {
-  const r = thumb.getBoundingClientRect();
-  const ex = getClientX(e);
-  if(ex < r.left - 16 || ex > r.right + 16) return;
-  dragging = true; startX = ex - thumbX;
-  thumb.style.transition = 'none'; e.preventDefault();
-});
-track.addEventListener('touchstart', e => {
-  dragging = true; startX = getClientX(e) - thumbX;
-  thumb.style.transition = 'none';
-}, {passive:true});
-
-document.addEventListener('mousemove', e => {
-  if(!dragging) return; e.preventDefault();
-  setPos(getClientX(e) - startX);
-});
-document.addEventListener('touchmove', e => {
+document.addEventListener('mousemove', onMove);
+document.addEventListener('touchmove', onMove, {passive:false});
+function onMove(e){
   if(!dragging) return;
-  setPos(getClientX(e) - startX);
-}, {passive:false});
+  e.preventDefault && e.preventDefault();
+  const x = getClientX(e) - startX;
+  setThumbPos(x);
+}
 
-function releaseDrag(){
-  if(!dragging) return; dragging = false;
-  if(thumbX >= SNAP){
-    thumb.style.transition = 'left .12s ease';
-    setPos(MAX_X);
+document.addEventListener('mouseup', endDrag);
+document.addEventListener('touchend', endDrag);
+function endDrag(){
+  if(!dragging) return;
+  dragging = false;
+  thumb.style.cursor = 'grab';
+  if(thumbX >= SNAP_THRESH){
+    thumb.style.transition = 'left .15s ease';
+    setThumbPos(MAX_X);
     setTimeout(answerCall, 180);
   } else {
-    thumb.style.transition = 'left .38s cubic-bezier(.34,1.56,.64,1)';
-    setPos(0);
-    slideText.style.opacity = 1;
+    thumb.style.transition = 'left .3s cubic-bezier(.34,1.56,.64,1)';
+    setThumbPos(0);
+    lbl.style.opacity = 1;
+    arrows.style.opacity = 1;
   }
 }
-document.addEventListener('mouseup', releaseDrag);
-document.addEventListener('touchend', releaseDrag);
 
-// ── CALL ──
 function answerCall(){
-  document.getElementById('ringScreen').style.display = 'none';
-  document.getElementById('dynamicIsland').classList.remove('ringing');
-  const vs = document.getElementById('videoScreen');
-  vs.classList.add('show');
-  const video = document.getElementById('birthdayVideo');
-  video.currentTime = 0;
-  video.play().catch(()=>{});
+  document.getElementById('callScreen').style.display = 'none';
+  const ac = document.getElementById('activeCall');
+  ac.style.display = 'flex';
   callSecs = 0;
   callInterval = setInterval(()=>{
     callSecs++;
     const mm = String(Math.floor(callSecs/60)).padStart(2,'0');
     const ss = String(callSecs%60).padStart(2,'0');
-    document.getElementById('videoTimer').textContent = mm+':'+ss;
-  }, 1000);
+    document.getElementById('acTimer').textContent = mm+':'+ss;
+  },1000);
 }
 
 function endCall(){
   clearInterval(callInterval);
-  document.getElementById('birthdayVideo').pause();
-  document.getElementById('videoScreen').classList.remove('show');
-  showHomeScreen();
+  document.getElementById('activeCall').style.display = 'none';
+  showHome();
 }
 
-// ── HOME ──
-function showHomeScreen(){
-  document.getElementById('homeScreen').classList.add('show');
-  buildAppGrid();
-  initDialpad();
+function showHome(){
+  const h = document.getElementById('homeScreen');
+  h.classList.add('show');
+  buildHome();
 }
 
-function buildAppGrid(){
+function remindMe(){ alert('Remind Me in 1 minute (simulated)'); }
+function sendMsg(){
+  const opts = ["Sorry, can't talk","I'll call you back","On my way!"];
+  const c = prompt('Send message:\n1. '+opts[0]+'\n2. '+opts[1]+'\n3. '+opts[2]+'\n\nEnter 1, 2 or 3:');
+  if(c && opts[parseInt(c)-1]) alert('Sent: "'+opts[parseInt(c)-1]+'"');
+}
+
+function buildHome(){
   const apps = [
-    {n:'Phone',  i:'📞', c:'linear-gradient(145deg,#3ed662,#34c759)', fn:'openPhoneApp()'},
-    {n:'Messages',i:'💬',c:'linear-gradient(145deg,#3ed662,#34c759)', fn:'openMessages()',badge:true},
-    {n:'Camera', i:'📷', c:'linear-gradient(145deg,#1c86ff,#007aff)', fn:''},
-    {n:'Maps',   i:'🗺️', c:'linear-gradient(145deg,#ffad3d,#ff9500)', fn:''},
-    {n:'Music',  i:'📻', c:'linear-gradient(145deg,#6b68f0,#5856d6)', fn:''},
-    {n:'Health', i:'❤️', c:'linear-gradient(145deg,#ff4d6a,#ff2d55)', fn:''},
-    {n:'Calendar',i:'📅',c:'linear-gradient(145deg,#35d0c8,#00c7be)', fn:''},
-    {n:'Settings',i:'⚙️',c:'linear-gradient(145deg,#aaaaaa,#888888)', fn:''},
-    {n:'Safari', i:'🌐', c:'linear-gradient(145deg,#1c86ff,#6b68f0)', fn:''},
-    {n:'Videos', i:'📺', c:'linear-gradient(145deg,#ff5042,#ff3b30)', fn:''},
-    {n:'Notes',  i:'📝', c:'linear-gradient(145deg,#ffd426,#ffcc00)', fn:''},
-    {n:'Files',  i:'🗂️', c:'linear-gradient(145deg,#45a8f5,#1c86ff)', fn:''}
+    {n:'Phone',i:'📞',c:'linear-gradient(135deg,#34c759,#20a044)'},
+    {n:'Messages',i:'💬',c:'linear-gradient(135deg,#34c759,#20a044)'},
+    {n:'Camera',i:'📷',c:'linear-gradient(135deg,#007aff,#0055b3)'},
+    {n:'Maps',i:'🗺️',c:'linear-gradient(135deg,#ff9500,#cc7700)'},
+    {n:'Music',i:'📻',c:'linear-gradient(135deg,#5856d6,#3634a3)'},
+    {n:'Health',i:'❤️',c:'linear-gradient(135deg,#ff2d55,#cc0030)'},
+    {n:'Calendar',i:'📅',c:'linear-gradient(135deg,#00c7be,#009990)'},
+    {n:'Settings',i:'⚙️',c:'linear-gradient(135deg,#ff9500,#ffcc00)'},
+    {n:'Safari',i:'🌐',c:'linear-gradient(135deg,#007aff,#5856d6)'},
+    {n:'Videos',i:'📺',c:'linear-gradient(135deg,#ff3b30,#c70025)'},
+    {n:'Notes',i:'📝',c:'linear-gradient(135deg,#34c759,#248a3d)'},
+    {n:'Files',i:'🔦',c:'linear-gradient(135deg,#8e8e93,#636366)'}
   ];
   document.getElementById('appGrid').innerHTML = apps.map(a=>`
-    <div class="app-icon" onclick="${a.fn}">
-      <div class="app-icon-img" style="background:${a.c}">
-        ${a.i}
-        ${a.badge?'<div class="badge" id="msgBadge" style="display:none">0</div>':''}
-      </div>
-      <div class="app-label">${a.n}</div>
+    <div class="app-ic">
+      <div class="app-ic-img" style="background:${a.c}">${a.i}</div>
+      <div class="app-lbl">${a.n}</div>
     </div>`).join('');
   document.getElementById('dock').innerHTML = apps.slice(0,4).map(a=>`
-    <div class="app-icon" onclick="${a.fn}">
-      <div class="app-icon-img" style="background:${a.c};width:56px;height:56px">
-        ${a.i}
-        ${a.badge?'<div class="badge" id="msgBadge2" style="display:none">0</div>':''}
-      </div>
+    <div class="app-ic">
+      <div class="app-ic-img" style="background:${a.c};width:52px;height:52px">${a.i}</div>
     </div>`).join('');
 }
 
-// ── QUICK ACTIONS ──
-function remindMe(){ alert('Remind Me (simulated)'); }
-function quickMessage(){
-  const opts = ["Sorry, can't talk right now","I'll call you back","On my way!"];
-  const c = prompt('Send a quick message:\n1. '+opts[0]+'\n2. '+opts[1]+'\n3. '+opts[2]+'\n\nEnter 1, 2 or 3:');
-  if(c && opts[parseInt(c)-1]) alert('Message sent: "'+opts[parseInt(c)-1]+'"');
-}
-
-// ── CLOCK ──
 function updateClock(){
   const now = new Date();
   const h = String(now.getHours()).padStart(2,'0');
@@ -647,89 +308,13 @@ function updateClock(){
   const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const d = days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()];
-  ['statusTime','homeClock'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=t; });
+  ['sbarTime','acSbarTime','homeSbarTime','homeClock'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=t;
+  });
   const hd=document.getElementById('homeDate');
   if(hd) hd.textContent=d;
 }
-
-// ── PHONE APP ──
-function openPhoneApp(){
-  document.getElementById('phoneApp').classList.add('active');
-  dialInput=''; updateDialDisplay();
-}
-function initDialpad(){
-  const keys=['1','2','3','4','5','6','7','8','9','*','0','#'];
-  const subs={2:'ABC',3:'DEF',4:'GHI',5:'JKL',6:'MNO',7:'PQRS',8:'TUV',9:'WXYZ',0:'+'};
-  const dp = document.getElementById('dialpad');
-  if(!dp) return;
-  dp.innerHTML=keys.map(k=>`
-    <button class="dial-key" onclick="dialPress('${k}')">
-      ${k}<span class="sub">${subs[k]||''}</span>
-    </button>`).join('');
-}
-function dialPress(k){ dialInput+=k; updateDialDisplay(); }
-function dialDelete(){ dialInput=dialInput.slice(0,-1); updateDialDisplay(); }
-function updateDialDisplay(){ document.getElementById('dialDisplay').textContent=dialInput||''; }
-function dialCall(){
-  if(dialInput==='*117#'){
-    closeApp('phoneApp');
-    showUssdMsg('Welcome to Airtel Zambia\n*117# USSD service.\n\nThis is a simulated response.\nDial *117# on a real Airtel line\nfor actual services.',false);
-  } else if(dialInput.startsWith('*')&&dialInput.endsWith('#')){
-    showUssdMsg('Service unavailable.\nPlease dial *117# for Airtel services.',true);
-  } else if(dialInput.length>0){
-    showUssdMsg(`Calling ${dialInput}…\n\n📞 Simulated call`,true);
-  }
-}
-
-// ── MESSAGES ──
-function openMessages(){
-  document.getElementById('messagesApp').classList.add('active');
-  renderMessagesList();
-}
-function renderMessagesList(){
-  const list=document.getElementById('messagesList');
-  const empty=document.getElementById('emptyMsgState');
-  if(currentMessages.length===0){ empty.style.display='flex'; return; }
-  empty.style.display='none';
-  list.innerHTML=currentMessages.map((msg,idx)=>`
-    <div class="message-thread" onclick="openMsgView(${idx})">
-      <div class="thread-avatar">${msg.sender[0]}</div>
-      <div class="thread-info">
-        <div class="thread-name">${msg.sender}</div>
-        <div class="thread-preview">${msg.preview}</div>
-      </div>
-      <div class="thread-time">${msg.time}</div>
-    </div>`).join('');
-}
-function openMsgView(idx){
-  const msg=currentMessages[idx];
-  document.getElementById('msgViewSender').textContent=msg.sender;
-  const b=document.getElementById('msgBubbles');
-  b.innerHTML=msg.bubbles.map(x=>`<div class="msg-time">${x.time}</div><div class="msg-bubble">${x.text}</div>`).join('');
-  document.getElementById('msgView').classList.add('active');
-  setTimeout(()=>b.scrollTop=b.scrollHeight,60);
-}
-function closeMsgView(){ document.getElementById('msgView').classList.remove('active'); }
-
-// ── USSD ──
-function showUssdMsg(text, autoClose){
-  const d=document.getElementById('ussdDialog');
-  document.getElementById('ussdContent').textContent=text;
-  document.getElementById('ussdInputArea').style.display='none';
-  document.getElementById('ussdActions').innerHTML='<button class="ussd-btn" onclick="closeUSSD()">OK</button>';
-  d.classList.add('active');
-  if(autoClose) setTimeout(closeUSSD,3000);
-}
-function closeUSSD(){ document.getElementById('ussdDialog').classList.remove('active'); }
-function closeApp(id){ document.getElementById(id).classList.remove('active'); }
-
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', ()=>{
-  updateClock();
-  setInterval(updateClock, 15000);
-  setTimeout(()=>{ document.getElementById('dynamicIsland').classList.add('ringing'); }, 600);
-  initDialpad();
-});
+updateClock();
+setInterval(updateClock,15000);
 </script>
-</body>
-</html>
