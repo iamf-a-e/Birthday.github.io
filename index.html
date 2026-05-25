@@ -1,17 +1,21 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Call</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:linear-gradient(135deg,#667eea,#764ba2);display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Nunito',sans-serif;padding:20px}
-  .wrap{text-align:center}
-  .title-txt{color:white;margin-bottom:20px;font-size:1.8rem;font-weight:700;text-shadow:2px 2px 8px rgba(0,0,0,0.3)}
-  .phone{width:375px;height:812px;background:#000;border-radius:54px;box-shadow:0 0 0 1px #333,0 0 0 3px #1a1a1a,0 0 0 5px #444,0 60px 120px rgba(0,0,0,0.8);position:relative;overflow:hidden;margin:0 auto}
+  html,body{height:100%;overflow:hidden}
+  body{background:linear-gradient(135deg,#667eea,#764ba2);display:flex;justify-content:center;align-items:center;height:100vh;font-family:'Nunito',sans-serif;overflow:hidden}
+  .wrap{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;width:100%}
+  .phone{width:min(375px,100vw);height:min(812px,100vh);background:#000;border-radius:clamp(20px,7vw,54px);box-shadow:0 0 0 1px #333,0 0 0 3px #1a1a1a,0 0 0 5px #444,0 40px 80px rgba(0,0,0,0.8);position:relative;overflow:hidden;margin:0 auto;flex-shrink:0}
   .phone::before{content:'';position:absolute;right:-5px;top:140px;width:4px;height:70px;background:#333;border-radius:0 3px 3px 0;box-shadow:0 90px 0 #333}
   .phone::after{content:'';position:absolute;left:-5px;top:120px;width:4px;height:35px;background:#333;border-radius:3px 0 0 3px;box-shadow:0 50px 0 #333,0 95px 0 #333}
-  .screen{width:100%;height:100%;border-radius:54px;overflow:hidden;position:relative}
+  .screen{width:100%;height:100%;border-radius:clamp(20px,7vw,54px);overflow:hidden;position:relative}
 
-  /* ── INCOMING CALL ── */
-  .call-screen{position:absolute;inset:0;background:linear-gradient(180deg,#111827 0%,#1e3a5f 55%,#0f2744 100%);border-radius:54px;display:flex;flex-direction:column;align-items:center;z-index:30}
+  .call-screen{position:absolute;inset:0;background:linear-gradient(180deg,#111827 0%,#1e3a5f 55%,#0f2744 100%);border-radius:clamp(20px,7vw,54px);display:flex;flex-direction:column;align-items:center;z-index:30}
   .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:50}
   .sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 28px 0;color:white;font-size:13px;font-weight:600;width:100%;position:relative;z-index:10}
 
@@ -20,39 +24,35 @@
   .caller-name{color:white;font-size:38px;font-weight:300;letter-spacing:-0.5px}
   .caller-sub{color:rgba(255,255,255,0.5);font-size:14px;margin-top:6px}
 
-  /* Avatar + pulses */
   .avatar-wrap{position:relative;display:flex;align-items:center;justify-content:center;margin-top:36px;width:160px;height:160px}
   .pulse{position:absolute;border-radius:50%;border:1.5px solid rgba(255,255,255,0.15);animation:pulse 2.4s ease-out infinite}
   .pulse:nth-child(1){width:150px;height:150px;animation-delay:0s}
   .pulse:nth-child(2){width:195px;height:195px;animation-delay:0.6s}
   .pulse:nth-child(3){width:240px;height:240px;animation-delay:1.2s}
   @keyframes pulse{0%{transform:scale(.75);opacity:0}40%{opacity:1}100%{transform:scale(1.2);opacity:0}}
-  .avatar{width:118px;height:118px;border-radius:59px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;font-size:50px;position:relative;z-index:2;border:3px solid rgba(255,255,255,0.2)}
+  .avatar{width:118px;height:118px;border-radius:59px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;font-size:50px;position:relative;z-index:2;border:3px solid rgba(255,255,255,0.2);animation:jiggle 2.2s ease-in-out infinite}
   @keyframes jiggle{0%,100%{transform:rotate(0)}15%{transform:rotate(-9deg)}30%{transform:rotate(9deg)}45%{transform:rotate(-6deg)}60%{transform:rotate(6deg)}75%{transform:rotate(-3deg)}88%{transform:rotate(3deg)}}
-  .avatar{animation:jiggle 2.2s ease-in-out infinite}
 
-  /* Quick-action buttons */
   .quick-btns{display:flex;gap:44px;margin-top:48px}
   .qbtn{display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer}
   .qbtn-circle{width:54px;height:54px;border-radius:27px;background:rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;font-size:22px;transition:background .15s}
   .qbtn-circle:active{background:rgba(255,255,255,0.28)}
   .qbtn-lbl{color:rgba(255,255,255,0.75);font-size:12px;font-weight:400}
 
-  /* ── SLIDE TO ANSWER ── */
   .slide-area{margin-top:auto;margin-bottom:56px;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
-  .slide-hint{color:rgba(255,255,255,0.45);font-size:13px;font-weight:400;letter-spacing:0.2px}
   .slide-track{width:300px;height:64px;background:rgba(255,255,255,0.10);border-radius:32px;position:relative;border:1px solid rgba(255,255,255,0.18);overflow:hidden;touch-action:none;cursor:pointer;user-select:none}
   .slide-fill{position:absolute;left:0;top:0;height:100%;width:64px;background:rgba(52,199,89,0.0);border-radius:32px;transition:none;pointer-events:none}
   .slide-thumb{position:absolute;left:6px;top:6px;width:52px;height:52px;border-radius:26px;background:#34c759;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:grab;box-shadow:0 2px 12px rgba(52,199,89,0.5);transition:left .05s;will-change:left}
   .slide-arrow-txt{position:absolute;right:20px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.55);font-size:22px;pointer-events:none;letter-spacing:-4px}
-  .slide-label{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;color:rgba(255,255,255,0.6);font-size:14px;font-weight:400;pointer-events:none;padding-left:60px;padding-right:20px}
+  .slide-label{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;color:rgba(255,255,255,0.6);font-size:14px;font-weight:400;pointer-events:none;padding-left:60px;padding-right:20px;animation:shimmer 1.6s ease-in-out infinite}
+  @keyframes shimmer{0%,100%{opacity:.45}50%{opacity:.9}}
 
-  /* ── ACTIVE CALL ── */
-  .active-call{display:none;position:absolute;inset:0;background:linear-gradient(180deg,#0d1f0d 0%,#132913 100%);border-radius:54px;z-index:40;flex-direction:column;align-items:center}
+  .active-call{display:none;position:absolute;inset:0;background:linear-gradient(180deg,#0d1f0d 0%,#132913 100%);border-radius:clamp(20px,7vw,54px);z-index:40;flex-direction:column;align-items:center}
   .ac-name{color:white;font-size:30px;font-weight:300;margin-top:90px}
   .ac-timer{color:rgba(255,255,255,0.55);font-size:16px;margin-top:10px}
   .ac-sub{color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px}
   .ac-avatar{font-size:64px;margin-top:48px;animation:jiggle 3s ease-in-out infinite}
+  .audio-status{color:rgba(255,255,255,0.5);font-size:12px;margin-top:6px;text-align:center;min-height:16px}
   .ac-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 36px;margin-top:auto;margin-bottom:16px;width:100%}
   .ac-btn{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
   .ac-btn-circle{width:56px;height:56px;border-radius:28px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;transition:background .15s}
@@ -63,8 +63,7 @@
   .end-btn:active{transform:scale(.91)}
   .end-lbl{color:rgba(255,255,255,0.7);font-size:13px}
 
-  /* ── HOME ── */
-  .home-screen{display:none;position:absolute;inset:0;background:linear-gradient(160deg,#0d47a1,#1565c0 30%,#6a1b9a 70%,#4a148c);border-radius:54px;flex-direction:column}
+  .home-screen{display:none;position:absolute;inset:0;background:linear-gradient(160deg,#0d47a1,#1565c0 30%,#6a1b9a 70%,#4a148c);border-radius:clamp(20px,7vw,54px);flex-direction:column}
   .home-screen.show{display:flex}
   .home-sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 28px 0;color:white;font-size:14px;font-weight:600;position:relative;z-index:10}
   .home-clock{text-align:center;margin-top:56px;color:white;position:relative;z-index:5}
@@ -77,12 +76,12 @@
   .dock{background:rgba(255,255,255,0.13);backdrop-filter:blur(20px);border-radius:30px;margin:0 16px 34px;padding:12px 18px;display:flex;justify-content:space-around;position:relative;z-index:5}
   .home-indicator{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:130px;height:5px;background:rgba(255,255,255,0.28);border-radius:3px;z-index:100}
 
-  @keyframes shimmer{0%,100%{opacity:.45}50%{opacity:.9}}
-  .slide-label{animation:shimmer 1.6s ease-in-out infinite}
+  .replay-active .ac-btn-circle{background:rgba(52,199,89,0.35)!important}
 </style>
+</head>
+<body>
 
 <div class="wrap">
-  <div class="title-txt"></div>
   <div class="phone">
     <div class="screen">
 
@@ -93,20 +92,17 @@
           <span id="sbarTime">9:41</span>
           <div style="display:flex;gap:5px;font-size:12px"><span>📶</span><span>🔋</span></div>
         </div>
-
         <div class="call-top">
           <div class="incoming-lbl">incoming call</div>
           <div class="caller-name">Birthday 🎂</div>
           <div class="caller-sub"></div>
         </div>
-
         <div class="avatar-wrap">
           <div class="pulse"></div>
           <div class="pulse"></div>
           <div class="pulse"></div>
           <div class="avatar">🎂</div>
         </div>
-
         <div class="quick-btns">
           <div class="qbtn">
             <div class="qbtn-circle" onclick="remindMe()">⏰</div>
@@ -117,7 +113,6 @@
             <div class="qbtn-lbl">Message</div>
           </div>
         </div>
-
         <div class="slide-area">
           <div class="slide-track" id="slideTrack">
             <div class="slide-fill" id="slideFill"></div>
@@ -139,9 +134,10 @@
         <div class="ac-timer" id="acTimer">00:00</div>
         <div class="ac-sub">Airtel Zambia</div>
         <div class="ac-avatar">🎂</div>
+        <div class="audio-status" id="audioStatus"></div>
         <div class="ac-actions">
-          <div class="ac-btn"><div class="ac-btn-circle">🔇</div><div class="ac-btn-lbl">mute</div></div>
-          <div class="ac-btn"><div class="ac-btn-circle">⌨️</div><div class="ac-btn-lbl">keypad</div></div>
+          <div class="ac-btn"><div class="ac-btn-circle" id="muteBtn" onclick="toggleMute()">🔇</div><div class="ac-btn-lbl">mute</div></div>
+          <div class="ac-btn" id="replayBtn" onclick="replayAudio()"><div class="ac-btn-circle">🔁</div><div class="ac-btn-lbl">replay</div></div>
           <div class="ac-btn"><div class="ac-btn-circle">🔊</div><div class="ac-btn-lbl">speaker</div></div>
           <div class="ac-btn"><div class="ac-btn-circle">➕</div><div class="ac-btn-lbl">add call</div></div>
           <div class="ac-btn"><div class="ac-btn-circle">📹</div><div class="ac-btn-lbl">FaceTime</div></div>
@@ -171,111 +167,144 @@
 
     </div>
   </div>
-  <p style="color:white;margin-top:12px;opacity:.75;font-size:14px"></p>
 </div>
 
 <script>
-const TRACK_W = 300, THUMB_W = 52, THUMB_PAD = 6;
-const MAX_X = TRACK_W - THUMB_W - THUMB_PAD * 2;
-const SNAP_THRESH = MAX_X * 0.72;
+const TRACK_W=300,THUMB_W=52,THUMB_PAD=6;
+const MAX_X=TRACK_W-THUMB_W-THUMB_PAD*2;
+const SNAP_THRESH=MAX_X*0.72;
 
-let dragging = false, startX = 0, curX = 0, thumbX = 0;
-let callSecs = 0, callInterval = null;
+let dragging=false,startX=0,thumbX=0;
+let callSecs=0,callInterval=null;
+let audio=null,muted=false;
 
-const track = document.getElementById('slideTrack');
-const thumb = document.getElementById('slideThumb');
-const fill  = document.getElementById('slideFill');
-const lbl   = document.getElementById('slideLabel');
-const arrows= document.getElementById('slideArrows');
+const track=document.getElementById('slideTrack');
+const thumb=document.getElementById('slideThumb');
+const fill=document.getElementById('slideFill');
+const lbl=document.getElementById('slideLabel');
+const arrows=document.getElementById('slideArrows');
+const audioStatus=document.getElementById('audioStatus');
+
+function initAudio(){
+  if(audio) return;
+  audio=new Audio('birthday.mp3');
+  audio.addEventListener('play',()=>{ audioStatus.textContent='🎵 Playing birthday song…'; });
+  audio.addEventListener('ended',()=>{ audioStatus.textContent='🎵 Song finished — tap 🔁 to replay'; });
+  audio.addEventListener('error',()=>{ audioStatus.textContent='⚠️ birthday.mp3 not found — add the file'; });
+}
+
+function playBirthdaySong(){
+  initAudio();
+  audio.currentTime=0;
+  audio.muted=muted;
+  audio.play().catch(()=>{ audioStatus.textContent='⚠️ Could not autoplay — tap 🔁 to play'; });
+}
+
+function replayAudio(){
+  initAudio();
+  audio.currentTime=0;
+  audio.muted=muted;
+  audio.play().catch(()=>{ audioStatus.textContent='⚠️ Playback blocked by browser'; });
+  const btn=document.getElementById('replayBtn');
+  btn.classList.add('replay-active');
+  setTimeout(()=>btn.classList.remove('replay-active'),400);
+}
+
+function toggleMute(){
+  muted=!muted;
+  if(audio) audio.muted=muted;
+  document.getElementById('muteBtn').textContent=muted?'🔕':'🔇';
+}
 
 function setThumbPos(x){
-  x = Math.max(0, Math.min(x, MAX_X));
-  thumbX = x;
-  thumb.style.left = (x + THUMB_PAD) + 'px';
-  const pct = x / MAX_X;
-  fill.style.width = (x + THUMB_PAD + THUMB_W) + 'px';
-  fill.style.background = `rgba(52,199,89,${pct * 0.35})`;
-  lbl.style.opacity = Math.max(0, 1 - pct * 2.5);
-  arrows.style.opacity = Math.max(0, 1 - pct * 2);
+  x=Math.max(0,Math.min(x,MAX_X));
+  thumbX=x;
+  thumb.style.left=(x+THUMB_PAD)+'px';
+  const pct=x/MAX_X;
+  fill.style.width=(x+THUMB_PAD+THUMB_W)+'px';
+  fill.style.background=`rgba(52,199,89,${pct*0.35})`;
+  lbl.style.opacity=Math.max(0,1-pct*2.5);
+  arrows.style.opacity=Math.max(0,1-pct*2);
 }
 
-function getClientX(e){ return e.touches ? e.touches[0].clientX : e.clientX; }
+function getClientX(e){ return e.touches?e.touches[0].clientX:e.clientX; }
 
-track.addEventListener('mousedown', startDrag);
-track.addEventListener('touchstart', startDrag, {passive:true});
+track.addEventListener('mousedown',startDrag);
+track.addEventListener('touchstart',startDrag,{passive:true});
 
 function startDrag(e){
-  const rect = thumb.getBoundingClientRect();
-  const ex = getClientX(e);
-  if(ex < rect.left - 10 || ex > rect.right + 10) return;
-  dragging = true;
-  startX = ex - thumbX;
-  thumb.style.transition = 'none';
-  thumb.style.cursor = 'grabbing';
-  e.preventDefault && e.preventDefault();
+  const rect=thumb.getBoundingClientRect();
+  const ex=getClientX(e);
+  if(ex<rect.left-10||ex>rect.right+10) return;
+  dragging=true;
+  startX=ex-thumbX;
+  thumb.style.transition='none';
+  thumb.style.cursor='grabbing';
+  e.preventDefault&&e.preventDefault();
 }
 
-document.addEventListener('mousemove', onMove);
-document.addEventListener('touchmove', onMove, {passive:false});
+document.addEventListener('mousemove',onMove);
+document.addEventListener('touchmove',onMove,{passive:false});
 function onMove(e){
   if(!dragging) return;
-  e.preventDefault && e.preventDefault();
-  const x = getClientX(e) - startX;
+  e.preventDefault&&e.preventDefault();
+  const x=getClientX(e)-startX;
   setThumbPos(x);
 }
 
-document.addEventListener('mouseup', endDrag);
-document.addEventListener('touchend', endDrag);
+document.addEventListener('mouseup',endDrag);
+document.addEventListener('touchend',endDrag);
 function endDrag(){
   if(!dragging) return;
-  dragging = false;
-  thumb.style.cursor = 'grab';
-  if(thumbX >= SNAP_THRESH){
-    thumb.style.transition = 'left .15s ease';
+  dragging=false;
+  thumb.style.cursor='grab';
+  if(thumbX>=SNAP_THRESH){
+    thumb.style.transition='left .15s ease';
     setThumbPos(MAX_X);
-    setTimeout(answerCall, 180);
+    setTimeout(answerCall,180);
   } else {
-    thumb.style.transition = 'left .3s cubic-bezier(.34,1.56,.64,1)';
+    thumb.style.transition='left .3s cubic-bezier(.34,1.56,.64,1)';
     setThumbPos(0);
-    lbl.style.opacity = 1;
-    arrows.style.opacity = 1;
+    lbl.style.opacity=1;
+    arrows.style.opacity=1;
   }
 }
 
 function answerCall(){
-  document.getElementById('callScreen').style.display = 'none';
-  const ac = document.getElementById('activeCall');
-  ac.style.display = 'flex';
-  callSecs = 0;
-  callInterval = setInterval(()=>{
+  document.getElementById('callScreen').style.display='none';
+  const ac=document.getElementById('activeCall');
+  ac.style.display='flex';
+  callSecs=0;
+  callInterval=setInterval(()=>{
     callSecs++;
-    const mm = String(Math.floor(callSecs/60)).padStart(2,'0');
-    const ss = String(callSecs%60).padStart(2,'0');
-    document.getElementById('acTimer').textContent = mm+':'+ss;
+    const mm=String(Math.floor(callSecs/60)).padStart(2,'0');
+    const ss=String(callSecs%60).padStart(2,'0');
+    document.getElementById('acTimer').textContent=mm+':'+ss;
   },1000);
+  playBirthdaySong();
 }
 
 function endCall(){
   clearInterval(callInterval);
-  document.getElementById('activeCall').style.display = 'none';
+  if(audio){ audio.pause(); audio.currentTime=0; }
+  document.getElementById('activeCall').style.display='none';
   showHome();
 }
 
 function showHome(){
-  const h = document.getElementById('homeScreen');
-  h.classList.add('show');
+  document.getElementById('homeScreen').classList.add('show');
   buildHome();
 }
 
 function remindMe(){ alert('Remind Me in 1 minute (simulated)'); }
 function sendMsg(){
-  const opts = ["Sorry, can't talk","I'll call you back","On my way!"];
-  const c = prompt('Send message:\n1. '+opts[0]+'\n2. '+opts[1]+'\n3. '+opts[2]+'\n\nEnter 1, 2 or 3:');
-  if(c && opts[parseInt(c)-1]) alert('Sent: "'+opts[parseInt(c)-1]+'"');
+  const opts=["Sorry, can't talk","I'll call you back","On my way!"];
+  const c=prompt('Send message:\n1. '+opts[0]+'\n2. '+opts[1]+'\n3. '+opts[2]+'\n\nEnter 1, 2 or 3:');
+  if(c&&opts[parseInt(c)-1]) alert('Sent: "'+opts[parseInt(c)-1]+'"');
 }
 
 function buildHome(){
-  const apps = [
+  const apps=[
     {n:'Phone',i:'📞',c:'linear-gradient(135deg,#34c759,#20a044)'},
     {n:'Messages',i:'💬',c:'linear-gradient(135deg,#34c759,#20a044)'},
     {n:'Camera',i:'📷',c:'linear-gradient(135deg,#007aff,#0055b3)'},
@@ -289,25 +318,25 @@ function buildHome(){
     {n:'Notes',i:'📝',c:'linear-gradient(135deg,#34c759,#248a3d)'},
     {n:'Files',i:'🔦',c:'linear-gradient(135deg,#8e8e93,#636366)'}
   ];
-  document.getElementById('appGrid').innerHTML = apps.map(a=>`
+  document.getElementById('appGrid').innerHTML=apps.map(a=>`
     <div class="app-ic">
       <div class="app-ic-img" style="background:${a.c}">${a.i}</div>
       <div class="app-lbl">${a.n}</div>
     </div>`).join('');
-  document.getElementById('dock').innerHTML = apps.slice(0,4).map(a=>`
+  document.getElementById('dock').innerHTML=apps.slice(0,4).map(a=>`
     <div class="app-ic">
       <div class="app-ic-img" style="background:${a.c};width:52px;height:52px">${a.i}</div>
     </div>`).join('');
 }
 
 function updateClock(){
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  const t = h+':'+m;
+  const now=new Date();
+  const h=String(now.getHours()).padStart(2,'0');
+  const m=String(now.getMinutes()).padStart(2,'0');
+  const t=h+':'+m;
   const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const d = days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()];
+  const d=days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()];
   ['sbarTime','acSbarTime','homeSbarTime','homeClock'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.textContent=t;
@@ -318,3 +347,5 @@ function updateClock(){
 updateClock();
 setInterval(updateClock,15000);
 </script>
+</body>
+</html>
