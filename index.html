@@ -52,7 +52,7 @@
   .ac-timer{color:rgba(255,255,255,0.55);font-size:16px;margin-top:10px}
   .ac-sub{color:rgba(255,255,255,0.4);font-size:13px;margin-top:4px}
   .ac-avatar{font-size:64px;margin-top:48px;animation:jiggle 3s ease-in-out infinite}
-  .audio-status{color:rgba(255,255,255,0.5);font-size:12px;margin-top:6px;text-align:center;min-height:16px}
+  .audio-status{color:rgba(255,255,255,0.5);font-size:12px;margin-top:6px;text-align:center;min-height:16px;padding:0 20px}
   .ac-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:0 36px;margin-top:auto;margin-bottom:16px;width:100%}
   .ac-btn{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
   .ac-btn-circle{width:56px;height:56px;border-radius:28px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;transition:background .15s}
@@ -75,7 +75,6 @@
   .app-lbl{color:white;font-size:11px;font-weight:500;text-shadow:0 1px 3px rgba(0,0,0,0.7)}
   .dock{background:rgba(255,255,255,0.13);backdrop-filter:blur(20px);border-radius:30px;margin:0 16px 34px;padding:12px 18px;display:flex;justify-content:space-around;position:relative;z-index:5}
   .home-indicator{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:130px;height:5px;background:rgba(255,255,255,0.28);border-radius:3px;z-index:100}
-
   .replay-active .ac-btn-circle{background:rgba(52,199,89,0.35)!important}
 </style>
 </head>
@@ -176,7 +175,7 @@ const SNAP_THRESH=MAX_X*0.72;
 
 let dragging=false,startX=0,thumbX=0;
 let callSecs=0,callInterval=null;
-let audio=null,muted=false;
+let muted=false,audioUnlocked=false;
 
 const track=document.getElementById('slideTrack');
 const thumb=document.getElementById('slideThumb');
@@ -185,23 +184,31 @@ const lbl=document.getElementById('slideLabel');
 const arrows=document.getElementById('slideArrows');
 const audioStatus=document.getElementById('audioStatus');
 
-function initAudio(){
-  if(audio) return;
-  audio=new Audio('birthday.mp3');
-  audio.addEventListener('play',()=>{ audioStatus.textContent='🎵 Playing birthday song…'; });
-  audio.addEventListener('ended',()=>{ audioStatus.textContent='🎵 Song finished — tap 🔁 to replay'; });
-  audio.addEventListener('error',()=>{ audioStatus.textContent='⚠️ birthday.mp3 not found — add the file'; });
+// Create audio element up front so browser sees it early
+const audio = new Audio('birthday.mp3');
+audio.preload = 'auto';
+audio.addEventListener('play',()=>{ audioStatus.textContent='🎵 Playing birthday song…'; });
+audio.addEventListener('ended',()=>{ audioStatus.textContent='🎵 Song finished — tap 🔁 to replay'; });
+audio.addEventListener('error',(e)=>{ audioStatus.textContent='⚠️ Could not load birthday.mp3'; });
+
+// Unlock audio on the very first user interaction anywhere on the page.
+// We play + immediately pause to satisfy the browser autoplay policy,
+// so a later .play() call works without a gesture.
+function unlockAudio(){
+  if(audioUnlocked) return;
+  audioUnlocked=true;
+  audio.play().then(()=>{ audio.pause(); audio.currentTime=0; }).catch(()=>{});
 }
+document.addEventListener('mousedown', unlockAudio, {once:true});
+document.addEventListener('touchstart', unlockAudio, {once:true});
 
 function playBirthdaySong(){
-  initAudio();
   audio.currentTime=0;
   audio.muted=muted;
-  audio.play().catch(()=>{ audioStatus.textContent='⚠️ Could not autoplay — tap 🔁 to play'; });
+  audio.play().catch(()=>{ audioStatus.textContent='⚠️ Tap 🔁 to play'; });
 }
 
 function replayAudio(){
-  initAudio();
   audio.currentTime=0;
   audio.muted=muted;
   audio.play().catch(()=>{ audioStatus.textContent='⚠️ Playback blocked by browser'; });
@@ -212,7 +219,7 @@ function replayAudio(){
 
 function toggleMute(){
   muted=!muted;
-  if(audio) audio.muted=muted;
+  audio.muted=muted;
   document.getElementById('muteBtn').textContent=muted?'🔕':'🔇';
 }
 
@@ -286,7 +293,8 @@ function answerCall(){
 
 function endCall(){
   clearInterval(callInterval);
-  if(audio){ audio.pause(); audio.currentTime=0; }
+  audio.pause();
+  audio.currentTime=0;
   document.getElementById('activeCall').style.display='none';
   showHome();
 }
