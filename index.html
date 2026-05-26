@@ -187,8 +187,8 @@ const audioStatus=document.getElementById('audioStatus');
 // Create audio element up front so browser sees it early
 const audio = new Audio('birthday.mp3');
 audio.preload = 'auto';
-audio.addEventListener('play',()=>{ audioStatus.textContent='🎵 Playing birthday song…'; });
-audio.addEventListener('ended',()=>{ audioStatus.textContent='🎵 Song finished — tap 🔁 to replay'; });
+audio.addEventListener('play',()=>{ audioStatus.textContent=''; });
+audio.addEventListener('ended',()=>{ audioStatus.textContent='🎵 Audio finished — tap 🔁 to replay'; });
 audio.addEventListener('error',(e)=>{ audioStatus.textContent='⚠️ Could not load birthday.mp3'; });
 
 // Unlock audio on the very first user interaction anywhere on the page.
